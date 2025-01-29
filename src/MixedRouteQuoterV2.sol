@@ -18,7 +18,6 @@ import {V3CallbackValidation} from "./libraries/V3CallbackValidation.sol";
 import {IMixedRouteQuoterV2} from "./interfaces/IMixedRouteQuoterV2.sol";
 import {V3PoolAddress} from "./libraries/V3PoolAddress.sol";
 import {Path} from "./libraries/Path.sol";
-import {IWETH9} from "./interfaces/external/IWETH9.sol";
 
 contract MixedRouteQuoterV2 is IUniswapV3SwapCallback, IMixedRouteQuoterV2, BaseV4Quoter {
     using Path for bytes;
@@ -27,17 +26,12 @@ contract MixedRouteQuoterV2 is IUniswapV3SwapCallback, IMixedRouteQuoterV2, Base
 
     address public immutable uniswapV3Poolfactory;
     address public immutable uniswapV2Poolfactory;
-    address public immutable weth9;
 
-    constructor(
-        IPoolManager _uniswapV4PoolManager,
-        address _uniswapV3Poolfactory,
-        address _uniswapV2Poolfactory,
-        address _weth9
-    ) BaseV4Quoter(_uniswapV4PoolManager) {
+    constructor(IPoolManager _uniswapV4PoolManager, address _uniswapV3Poolfactory, address _uniswapV2Poolfactory)
+        BaseV4Quoter(_uniswapV4PoolManager)
+    {
         uniswapV3Poolfactory = _uniswapV3Poolfactory;
         uniswapV2Poolfactory = _uniswapV2Poolfactory;
-        weth9 = _weth9;
     }
 
     /// V3 FUNCTIONS
@@ -191,14 +185,8 @@ contract MixedRouteQuoterV2 is IUniswapV3SwapCallback, IMixedRouteQuoterV2, Base
                 gasEstimate += _gasEstimate;
                 amountIn = _amountOut;
             } else if (protocolVersion == uint8(0)) {
-                (address tokenIn,) = path.decodeFirstV2Pool();
-                if (tokenIn == address(0)) {
-                    // if the input token is eth, wrap it
-                    IWETH9(weth9).deposit{value: amountIn}();
-                } else {
-                    // if the input token is weth, unwrap it
-                    IWETH9(weth9).withdraw(amountIn);
-                }
+                gasEstimate += 20_000;
+                // no change to amountIn
             } else {
                 revert InvalidProtocolVersion(protocolVersion);
             }

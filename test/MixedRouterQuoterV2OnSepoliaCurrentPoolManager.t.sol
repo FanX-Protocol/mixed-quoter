@@ -34,8 +34,7 @@ contract MixedRouteQuoterV2TestOnSepolia is Test {
     function setUp() public {
         vm.createSelectFork(vm.envString("SEPOLIA_RPC_URL"));
         poolManager = IPoolManager(uniswapV4PoolManager);
-        mixedRouteQuoterV2 =
-            new MixedRouteQuoterV2(poolManager, uniswapV3PoolFactory, uniswapV2PoolFactory, SEPOLIA_WETH_ADDRESS);
+        mixedRouteQuoterV2 = new MixedRouteQuoterV2(poolManager, uniswapV3PoolFactory, uniswapV2PoolFactory);
         v3QuoterV2 = IQuoterV2(v3QuoterV2Address);
         quoter = new Quoter(poolManager);
     }
