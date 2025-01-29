@@ -34,7 +34,8 @@ contract MixedRouteQuoterV2TestOnSepolia is Test {
     function setUp() public {
         vm.createSelectFork(vm.envString("SEPOLIA_RPC_URL"));
         poolManager = IPoolManager(uniswapV4PoolManager);
-        mixedRouteQuoterV2 = new MixedRouteQuoterV2(poolManager, uniswapV3PoolFactory, uniswapV2PoolFactory);
+        mixedRouteQuoterV2 =
+            new MixedRouteQuoterV2(poolManager, uniswapV3PoolFactory, uniswapV2PoolFactory, SEPOLIA_WETH_ADDRESS);
         v3QuoterV2 = IQuoterV2(v3QuoterV2Address);
         quoter = new Quoter(poolManager);
     }
@@ -120,13 +121,21 @@ contract MixedRouteQuoterV2TestOnSepolia is Test {
 
         // bytes memory path = abi.encodePacked(V4_SEPOLIA_OP_ADDRESS, fee,tickSpacing, hooks, V4_SEPOLIA_USDC_ADDRESS);
         IMixedRouteQuoterV2.ExtraQuoteExactInputParams memory extraParams =
-                            IMixedRouteQuoterV2.ExtraQuoteExactInputParams({nonEncodableData: nonEncodableData});
+            IMixedRouteQuoterV2.ExtraQuoteExactInputParams({nonEncodableData: nonEncodableData});
         uint8 protocolVersion = uint8(4);
         uint24 encodedFee = (uint24(protocolVersion) << v4FeeShift) + fee;
         uint8 v3ProtocolVersion = uint8(3);
         uint24 encodedV3Fee = (uint24(v3ProtocolVersion) << v4FeeShift) + fee;
         console.log(encodedV3Fee);
-        bytes memory path = abi.encodePacked(SEPOLIA_WETH_ADDRESS, encodedFee, tickSpacing, hooks, SEPOLIA_USDC_ADDRESS, encodedV3Fee, SEPOLIA_UNI_ADDRESS);
+        bytes memory path = abi.encodePacked(
+            SEPOLIA_WETH_ADDRESS,
+            encodedFee,
+            tickSpacing,
+            hooks,
+            SEPOLIA_USDC_ADDRESS,
+            encodedV3Fee,
+            SEPOLIA_UNI_ADDRESS
+        );
 
         (uint256 amountOut, uint256 gasEstimate) = mixedRouteQuoterV2.quoteExactInput(path, extraParams, amountIn);
 

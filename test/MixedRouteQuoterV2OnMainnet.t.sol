@@ -27,7 +27,7 @@ contract MixedRouteQuoterV2TestOnMainnet is Test {
         vm.createSelectFork(vm.envString("MAINNET_RPC_URL"));
         poolManager = IPoolManager(uniswapV4PoolManager);
         mixedRouteQuoterV1 = IMixedRouteQuoterV1(0x84E44095eeBfEC7793Cd7d5b57B7e401D7f1cA2E); // We use deployed address of MixedRouteQuoterV1 on mainnet for testing
-        mixedRouteQuoterV2 = new MixedRouteQuoterV2(poolManager, uniswapV3PoolFactory, uniswapV2PoolFactory);
+        mixedRouteQuoterV2 = new MixedRouteQuoterV2(poolManager, uniswapV3PoolFactory, uniswapV2PoolFactory, WETH);
     }
 
     function test_FuzzQuoteExactInput_MultiTokenPath_IncludeFOT(uint256 amountIn) public {

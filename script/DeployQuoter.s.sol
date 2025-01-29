@@ -10,11 +10,14 @@ import {MixedRouteQuoterV2} from "../src/MixedRouteQuoterV2.sol";
 contract DeployQuoter is Script {
     function setUp() public {}
 
-    function run(address poolManager, address v3Factory, address v2Factory) public returns (MixedRouteQuoterV2 state) {
+    function run(address poolManager, address v3Factory, address v2Factory, address weth9)
+        public
+        returns (MixedRouteQuoterV2 state)
+    {
         vm.startBroadcast();
 
         // forge script --broadcast --sig 'run(address, address, address)' --rpc-url <RPC_URL> --private-key <PRIV_KEY> --verify script/DeployQuoter.s.sol:DeployQuoter <POOL_MANAGER_ADDR> <V3_FACTORY_ADDRESS> <V2_FACTORY_ADDRESS> <UNISWAP_V2_SWP_ROUTER_02>
-        state = new MixedRouteQuoterV2(IPoolManager(poolManager), v3Factory, v2Factory);
+        state = new MixedRouteQuoterV2(IPoolManager(poolManager), v3Factory, v2Factory, weth9);
         console2.log("MixedRouteQuoterV2", address(state));
         console2.log("PoolManager", address(state.poolManager()));
 

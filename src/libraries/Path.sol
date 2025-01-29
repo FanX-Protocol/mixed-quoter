@@ -95,7 +95,8 @@ library Path {
     /// @notice Skips a token + fee element
     /// @param path The swap path
     function skipToken(bytes calldata path, uint8 protocolVersion) internal pure returns (bytes calldata) {
-        if (protocolVersion == uint8(2)) {
+        if (protocolVersion == uint8(2) || protocolVersion == uint8(0)) {
+            // treat wrap, unwrap command like protocol v2
             return path[Constants.NEXT_V2_POOL_OFFSET:];
         } else if (protocolVersion == uint8(3)) {
             return path[Constants.NEXT_V3_POOL_OFFSET:];
