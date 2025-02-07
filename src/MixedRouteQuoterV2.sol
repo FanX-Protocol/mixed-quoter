@@ -184,6 +184,10 @@ contract MixedRouteQuoterV2 is IUniswapV3SwapCallback, IMixedRouteQuoterV2, Base
                 );
                 gasEstimate += _gasEstimate;
                 amountIn = _amountOut;
+            } else if (protocolVersion == uint8(0)) {
+                // increase the gas estimate by the worst case erc20-transfer cost (cold sstore)
+                gasEstimate += 20_000;
+                // no change to amountIn
             } else {
                 revert InvalidProtocolVersion(protocolVersion);
             }

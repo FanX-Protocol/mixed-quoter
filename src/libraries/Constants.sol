@@ -8,6 +8,7 @@ library Constants {
     /// 01110000 is the bit mask.
     /// We only need one byte, 8 bit, because the fee is largest 100%, 1000000 hundreds of bps, or 000011110100001001000000
     /// So the first four bit can be reserved for protocol versions.
+    /// If protocol version is 0, 0000xxxxxxxxxxxxxxxxxxxx & 01110000 = 00000000
     /// If protocol version is 2, 0010xxxxxxxxxxxxxxxxxxxx & 01110000 = 00100000
     /// If protocol version is 3, 0011xxxxxxxxxxxxxxxxxxxx & 01110000 = 00110000
     /// If protocol version is 4, 0100xxxxxxxxxxxxxxxxxxxx & 01110000 = 01000000
