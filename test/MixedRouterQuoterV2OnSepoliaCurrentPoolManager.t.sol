@@ -3,12 +3,12 @@ pragma solidity ^0.8.24;
 
 import {Test, console} from "forge-std/Test.sol";
 import {IPoolManager} from "@uniswap/v4-core/src/interfaces/IPoolManager.sol";
-import {IQuoter} from "@uniswap/v4-periphery/src/interfaces/IQuoter.sol";
+import {IV4Quoter} from "@uniswap/v4-periphery/src/interfaces/IV4Quoter.sol";
 import {IQuoterV2} from "@uniswap/v3-periphery/contracts/interfaces/IQuoterV2.sol";
 
 import {IMixedRouteQuoterV2} from "../src/interfaces/IMixedRouteQuoterV2.sol";
 import {MixedRouteQuoterV2} from "../src/MixedRouteQuoterV2.sol";
-import {Quoter} from "v4-periphery/src/lens/Quoter.sol";
+import {V4Quoter} from "v4-periphery/src/lens/V4Quoter.sol";
 import {PathKey} from "@uniswap/v4-periphery/src/libraries/PathKey.sol";
 import {Currency} from "@uniswap/v4-core/src/types/Currency.sol";
 import {IHooks} from "@uniswap/v4-core/src/interfaces/IHooks.sol";
@@ -16,7 +16,7 @@ import {IHooks} from "@uniswap/v4-core/src/interfaces/IHooks.sol";
 contract MixedRouteQuoterV2TestOnSepolia is Test {
     IQuoterV2 public v3QuoterV2;
     IMixedRouteQuoterV2 public mixedRouteQuoterV2;
-    IQuoter public quoter;
+    IV4Quoter public quoter;
     IPoolManager public poolManager;
 
     address public immutable uniswapV4PoolManager = 0xE8E23e97Fa135823143d6b9Cba9c699040D51F70;
@@ -36,7 +36,7 @@ contract MixedRouteQuoterV2TestOnSepolia is Test {
         poolManager = IPoolManager(uniswapV4PoolManager);
         mixedRouteQuoterV2 = new MixedRouteQuoterV2(poolManager, uniswapV3PoolFactory, uniswapV2PoolFactory);
         v3QuoterV2 = IQuoterV2(v3QuoterV2Address);
-        quoter = new Quoter(poolManager);
+        quoter = new V4Quoter(poolManager);
     }
 
     function test_FuzzQuoteExactInput_ZeroForOneTrue(uint256 amountIn) public {
@@ -71,7 +71,7 @@ contract MixedRouteQuoterV2TestOnSepolia is Test {
             hookData: hookData
         });
 
-        IQuoter.QuoteExactParams memory exactInParams = IQuoter.QuoteExactParams({
+        IV4Quoter.QuoteExactParams memory exactInParams = IV4Quoter.QuoteExactParams({
             exactCurrency: Currency.wrap(SEPOLIA_WETH_ADDRESS),
             path: exactInPathKey,
             exactAmount: uint128(amountIn)
@@ -92,7 +92,7 @@ contract MixedRouteQuoterV2TestOnSepolia is Test {
             hookData: hookData
         });
 
-        IQuoter.QuoteExactParams memory exactOutParams = IQuoter.QuoteExactParams({
+        IV4Quoter.QuoteExactParams memory exactOutParams = IV4Quoter.QuoteExactParams({
             exactCurrency: Currency.wrap(SEPOLIA_USDC_ADDRESS),
             path: exactOutPathKey,
             exactAmount: uint128(expectedAmountOut)
@@ -149,7 +149,7 @@ contract MixedRouteQuoterV2TestOnSepolia is Test {
             hookData: hookData
         });
 
-        IQuoter.QuoteExactParams memory exactInParams = IQuoter.QuoteExactParams({
+        IV4Quoter.QuoteExactParams memory exactInParams = IV4Quoter.QuoteExactParams({
             exactCurrency: Currency.wrap(SEPOLIA_WETH_ADDRESS),
             path: exactInPathKey,
             exactAmount: uint128(amountIn)
