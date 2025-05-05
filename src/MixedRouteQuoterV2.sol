@@ -13,13 +13,15 @@ import {Currency} from "@uniswap/v4-core/src/types/Currency.sol";
 import {IHooks} from "@uniswap/v4-core/src/interfaces/IHooks.sol";
 import {BaseV4Quoter} from "@uniswap/v4-periphery/src/base/BaseV4Quoter.sol";
 import {QuoterRevert} from "@uniswap/v4-periphery/src/libraries/QuoterRevert.sol";
+import {Locker} from "@uniswap/v4-periphery/src/libraries/Locker.sol";
+import {IMsgSender} from "@uniswap/v4-periphery/src/interfaces/IMsgSender.sol";
 
 import {V3CallbackValidation} from "./libraries/V3CallbackValidation.sol";
 import {IMixedRouteQuoterV2} from "./interfaces/IMixedRouteQuoterV2.sol";
 import {V3PoolAddress} from "./libraries/V3PoolAddress.sol";
 import {Path} from "./libraries/Path.sol";
 
-contract MixedRouteQuoterV2 is IUniswapV3SwapCallback, IMixedRouteQuoterV2, BaseV4Quoter {
+contract MixedRouteQuoterV2 is IUniswapV3SwapCallback, IMixedRouteQuoterV2, IMsgSender, BaseV4Quoter {
     using Path for bytes;
     using SafeCast for uint256;
     using QuoterRevert for *;
@@ -32,6 +34,12 @@ contract MixedRouteQuoterV2 is IUniswapV3SwapCallback, IMixedRouteQuoterV2, Base
     {
         uniswapV3Poolfactory = _uniswapV3Poolfactory;
         uniswapV2Poolfactory = _uniswapV2Poolfactory;
+    }
+
+    modifier setMsgSender() {
+        Locker.set(msg.sender);
+        _; // execute the function
+        Locker.set(address(0)); // reset the locker
     }
 
     /// V3 FUNCTIONS
@@ -90,6 +98,7 @@ contract MixedRouteQuoterV2 is IUniswapV3SwapCallback, IMixedRouteQuoterV2, Base
     /// @inheritdoc IMixedRouteQuoterV2
     function quoteExactInputSingleV4(QuoteExactInputSingleV4Params memory params)
         public
+        setMsgSender
         returns (uint256 amountOut, uint256 gasEstimate)
     {
         uint256 gasBefore = gasleft();
@@ -194,5 +203,10 @@ contract MixedRouteQuoterV2 is IUniswapV3SwapCallback, IMixedRouteQuoterV2, Base
         }
         // the final amountOut is the amountIn for the "next step" that doesnt exist
         amountOut = amountIn;
+    }
+
+    /// @inheritdoc IMsgSender
+    function msgSender() external view returns (address) {
+        return Locker.get();
     }
 }
