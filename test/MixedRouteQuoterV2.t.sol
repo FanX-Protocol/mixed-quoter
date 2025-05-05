@@ -69,7 +69,8 @@ contract QuoterTest is Test, Deployers {
     }
 
     function test_fuzz_mixedQuoter_msgSender(address pranker, bool zeroForOne) public {
-        IMixedRouteQuoterV2.QuoteExactInputSingleV4Params memory params = IMixedRouteQuoterV2.QuoteExactInputSingleV4Params({
+        IMixedRouteQuoterV2.QuoteExactInputSingleV4Params memory params = IMixedRouteQuoterV2
+            .QuoteExactInputSingleV4Params({
             poolKey: key01Hook,
             zeroForOne: zeroForOne,
             exactAmount: 10000,
@@ -106,36 +107,6 @@ contract QuoterTest is Test, Deployers {
                 MAX_TICK,
                 calculateLiquidityFromAmounts(SQRT_PRICE_1_1, MIN_TICK, MAX_TICK, 1000000, 1000000).toInt256(),
                 0
-            ),
-            ZERO_BYTES
-        );
-    }
-
-    function setupPoolMultiplePositions(PoolKey memory poolKey) internal {
-        manager.initialize(poolKey, SQRT_PRICE_1_1);
-        MockERC20(Currency.unwrap(poolKey.currency0)).approve(address(modifyLiquidityRouter), type(uint256).max);
-        MockERC20(Currency.unwrap(poolKey.currency1)).approve(address(modifyLiquidityRouter), type(uint256).max);
-        modifyLiquidityRouter.modifyLiquidity(
-            poolKey,
-            ModifyLiquidityParams(
-                MIN_TICK,
-                MAX_TICK,
-                calculateLiquidityFromAmounts(SQRT_PRICE_1_1, MIN_TICK, MAX_TICK, 1000000, 1000000).toInt256(),
-                0
-            ),
-            ZERO_BYTES
-        );
-        modifyLiquidityRouter.modifyLiquidity(
-            poolKey,
-            ModifyLiquidityParams(
-                -60, 60, calculateLiquidityFromAmounts(SQRT_PRICE_1_1, -60, 60, 100, 100).toInt256(), 0
-            ),
-            ZERO_BYTES
-        );
-        modifyLiquidityRouter.modifyLiquidity(
-            poolKey,
-            ModifyLiquidityParams(
-                -120, 120, calculateLiquidityFromAmounts(SQRT_PRICE_1_1, -120, 120, 100, 100).toInt256(), 0
             ),
             ZERO_BYTES
         );
